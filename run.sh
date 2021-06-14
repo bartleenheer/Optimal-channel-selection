@@ -64,7 +64,7 @@ send_packets() {
 
 reconnect() {
     local starttime=$(date +%s)
-    while [[ $(nmcli c up "$APNAME") | grep "Error" ]]; do
+    while [[ -n $(nmcli c up "$APNAME" | grep "Error") ]]; do
         sleep 0.1
     done
     if [[ $(date +%s) -gt $(($starttime + $TIMEOUT)) ]]; then
