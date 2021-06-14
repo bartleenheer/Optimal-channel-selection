@@ -77,32 +77,32 @@ check_speed() {
     local bandwidth=$2
     echo "$channel $bandwidth" >> "$LOGFILE"
     echo "Now channel+bandwidth: $channel+$bandwidth"
-    if [[ $(ssh -i "$KEYFILE" "$USER@$IP" "/root/change-channel.sh -c \"$channel\" -b \"HT$bandwidth\" -t \"$TIMEOUT\"" ) ]]; then
-        echo "$channel $bandwidth doesn't work"
-    else
-        echo "Trying to reconnect"
-        if [[ -z $(reconnect) ]]; then # Only when able to reconnect we try pinging
-            local health=0.0
-            for interval in 0.1 0.01 0.001; do
-                for size in 10000 30000 60000; do
-                    echo "Now pinging $interval $size"
-                    local result=$(send_packets $interval $size)
-                    local rtt=$(echo $result | awk '{print$7}') # Obtain the average rtt from the results
-                    local packetLoss=$(echo $result | awk '{print$3}' | sed "s/%//" | awk '{print "scale=2; " $0 " / 100"}' | bc) # Convert percentage into floating point
-                    health=$(echo "scale=5; $health + ($rtt * (1 + $packetLoss))" | bc) # Calculate health with 4 decimals
-                    echo "$health"
-                done
+    ssh -i "$KEYFILE" "$USER@$IP" "/root/change-channel.sh -c \"$channel\" -b \"HT$bandwidth\" -t \"$TIMEOUT\""
+    echo "Trying to reconnect"
+    if [[ -z $(reconnect) ]]; then # Only when able to reconnect we try pinging
+        local health=0.0
+        for interval in 0.1 0.01 0.001; do
+            for size in 10000 30000 60000; do
+                echo "Now pinging $interval $size"
+                local result=$(send_packets $interval $size)
+                local rtt=$(echo $result | awk '{print$7}') # Obtain the average rtt from the results
+                local packetLoss=$(echo $result | awk '{print$3}' | sed "s/%//" | awk '{print "scale=2; " $0 " / 100"}' | bc) # Convert percentage into floating point
+                health=$(echo "scale=5; $health + ($rtt * (1 + $packetLoss))" | bc) # Calculate health with 4 decimals
+                echo "$health"
             done
-            echo "$health $channel $bandwidth" >> "$RESULTFILE"
-        else
-            echo "Could not reconnect, trying different bandwidth + channel"
-        fi
+        done
+        echo "$health $channel $bandwidth" >> "$RESULTFILE"
+    else
+        echo "Could not reconnect, trying different bandwidth + channel"
     fi
 
     echo "" >> "$LOGFILE"
 }
 
-rm log.txt
+touch $LOGFILE
+touch $RESULTFILE
+rm $LOGFILE
+rm $RESULTFILE
 for channel in "${CHANNELS[@]}"; do
     for bandwidth in "${BANDWIDTH[@]}"; do
         check_speed $channel $bandwidth
