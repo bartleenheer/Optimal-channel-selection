@@ -81,6 +81,7 @@ check_speed() {
         ssh -i "$KEYFILE" "$USER@$IP" "/root/change-channel.sh -c \"$channel\" -b \"$bandwidth\" -t \"$TIMEOUT\""
     ) &
     disown %1
+    git sleep 1
     echo "Trying to reconnect"
     if [[ -z $(reconnect) ]]; then # Only when able to reconnect we try pinging
         local health=0.0
