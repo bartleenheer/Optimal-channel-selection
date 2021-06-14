@@ -77,7 +77,7 @@ check_speed() {
     local bandwidth=$2
     echo "$channel $bandwidth" >> "$LOGFILE"
     echo "Now channel+bandwidth: $channel+$bandwidth"
-    ssh -i "$KEYFILE" "$USER@$IP" "/root/change-channel.sh -c \"$channel\" -b \"HT$bandwidth\" -t \"$TIMEOUT\""
+    ssh -i "$KEYFILE" "$USER@$IP" "/root/change-channel.sh -c \"$channel\" -b \"$bandwidth\" -t \"$TIMEOUT\""
     echo "Trying to reconnect"
     if [[ -z $(reconnect) ]]; then # Only when able to reconnect we try pinging
         local health=0.0
