@@ -2,8 +2,6 @@
 
 CHANNELS=(34 36 38 40 42 44 46 48 52 56 60 64 100 104 108 112 116 120 124 128 132 136 140 144 149 153 157 161 165)
 BANDWIDTH=(20 40- 40+)
-# CHANNELS=(112)
-# BANDWIDTH=(20)
 
 help() {
   echo "Usage: ./run.sh [-i IP] [-u USER] [-l LOGFILE] [-r RESULTFILE] [-v] [--keyfile KEYFILE] [-t TIMEOUT] [--skip-search] [--skip-optimize]"

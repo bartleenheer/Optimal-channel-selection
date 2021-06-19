@@ -1,19 +1,15 @@
 #!/bin/bash
 
 usage() {
-  echo "--Router: Usage: change-channel.sh -c CHANNEL -b BANDWIDTH [-t TIMEOUT]"
+  echo "--Router: Usage: change-channel.sh [-c CHANNEL] [-b BANDWIDTH] [-t TIMEOUT]"
 }
 
-if [[ $# -lt 2 ]]; then
-  echo "--Router: Invalid number of arguments"
-  usage
-  exit
-fi
-
 TIMEOUT=90
+DEFAULTCHANNEL=44
+DEFAULTBANDWIDTH=20
 
-channel=44
-bandwidth=20
+channel=$DEFAULTCHANNEL
+bandwidth=$DEFAULTBANDWIDTH
 
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
   case $1 in
@@ -50,7 +46,7 @@ echo "--Router: Changing to channel $channel and bandwidth $bandwidth"
   while [[ -z $(iw dev wlan0 station dump) ]]; do
     if [[ $(date +%s) -gt $(($starttime + $TIMEOUT)) ]]; then
       ip link set wlan0 down
-      iw dev wlan0 set channel "44" "HT20"
+      iw dev wlan0 set channel "$DEFAULTCHANNEL" "HT$DEFAULTBANDWIDTH"
       ip link set wlan0 up
       exit
     fi
